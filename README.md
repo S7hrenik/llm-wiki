@@ -5,9 +5,9 @@
 
 [![CI](https://github.com/S7hrenik/llm-wiki/actions/workflows/ci.yml/badge.svg)](https://github.com/S7hrenik/llm-wiki/actions/workflows/ci.yml)
 [![Lint](https://github.com/S7hrenik/llm-wiki/actions/workflows/lint.yml/badge.svg)](https://github.com/S7hrenik/llm-wiki/actions/workflows/lint.yml)
-[![PyPI](https://img.shields.io/pypi/v/llm-wiki)](https://pypi.org/project/llm-wiki/)
-[![Python](https://img.shields.io/pypi/pyversions/llm-wiki)](https://pypi.org/project/llm-wiki/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![PyPI - Coming Soon](https://img.shields.io/badge/PyPI-coming%20soon-lightgrey)](https://pypi.org/project/llm-wiki/)
 
 ---
 
@@ -18,8 +18,8 @@ Most RAG systems make the LLM do all the heavy lifting at query time — searchi
 LLM Wiki flips this: **Claude reads and synthesizes your documents when you add them**, compiling structured markdown pages. When you ask a question, Claude reads pre-built wiki pages — not raw source text.
 
 ```
-Basic RAG      →  question → search raw docs → LLM answers from scratch
-LLM Wiki       →  ingest doc → Claude compiles wiki → question → Claude reads wiki
+Basic RAG   →  question → search raw docs → LLM answers from scratch (every time)
+LLM Wiki    →  ingest doc → Claude compiles wiki → question → Claude reads wiki
 ```
 
 The wiki grows smarter with every document added. Contradictions are flagged. Entities are cross-referenced. Knowledge compounds.
@@ -33,34 +33,37 @@ llm-wiki/
 ├── CLAUDE.md              ← Agent instructions: how to maintain the wiki
 ├── agent.py               ← CLI entrypoint (interactive TUI)
 │
-├── raw/                   ← Your source documents (immutable)
+├── raw/                   ← Your source documents (immutable, never modified)
 │   └── assets/            ← Downloaded images
 │
 └── wiki/                  ← LLM-generated knowledge base
     ├── index.md           ← Catalog of all pages
     ├── log.md             ← Chronological action log
-    ├── overview.md        ← High-level synthesis
-    ├── sources/           ← One page per ingested document
-    └── entities/          ← One page per person, concept, or topic
+    ├── overview.md        ← High-level synthesis across all sources
+    ├── sources/           ← One summary page per ingested document
+    └── entities/          ← One page per person, concept, tool, or topic
 ```
 
 ### Three Layers
 
 | Layer | What It Is | Who Owns It |
 |---|---|---|
-| **Raw sources** | Documents, articles, PDFs — immutable source of truth | You |
+| **Raw sources** | Documents, articles, text files — immutable source of truth | You |
 | **The wiki** | Synthesized markdown: summaries, entity pages, index, log | Claude |
 | **The schema** | `CLAUDE.md` — instructions for how Claude maintains the wiki | Both |
 
 ---
 
+## Requirements
+
+- Python 3.10+
+- An [Anthropic API key](https://console.anthropic.com/)
+
+---
+
 ## Install
 
-```bash
-pip install llm-wiki
-```
-
-Or run from source:
+Clone and run from source:
 
 ```bash
 git clone https://github.com/S7hrenik/llm-wiki
@@ -68,11 +71,13 @@ cd llm-wiki
 pip install anthropic rich
 ```
 
-Set your API key — create a `.env` file in the project root:
+Create a `.env` file in the project root with your API key:
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
 ```
+
+> **PyPI package coming soon** — `pip install llm-wiki` will be available on the first release.
 
 ---
 
@@ -82,7 +87,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 python agent.py
 ```
 
-You'll land in the interactive menu:
+You'll land in an interactive menu:
 
 ```
 ╔══════════════════════════════════════════════════════════════════════╗
@@ -91,7 +96,6 @@ You'll land in the interactive menu:
 ║   ██║     ██║     ████╗ ████║    ██║    ██║██║██║ ██╔╝██║          ║
 ║   ██║     ██║     ██╔████╔██║    ██║ █╗ ██║██║█████╔╝ ██║          ║
 ║   ...                                                                ║
-║                                                                      ║
 ║      Knowledge synthesized at ingest time — not on every query      ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
@@ -106,17 +110,17 @@ You'll land in the interactive menu:
 
 ### Step-by-step
 
-**1. Init** — bootstrap the wiki structure:
+**1. Init** — bootstrap the wiki (run once):
 ```
 Choose: 1
 ```
 
-**2. Ingest** — add a document:
+**2. Ingest** — add a document or URL:
 ```
 Choose: 2
-File path or URL: raw/my-paper.pdf
+File path or URL: raw/my-paper.md
 ```
-Claude will create a source summary page, extract 5–15 entity pages, update the index, and log the action.
+Claude creates a source summary page, extracts 5–15 entity pages, updates the index, and logs the action.
 
 **3. Query** — ask anything:
 ```
@@ -130,7 +134,7 @@ Claude reads the pre-compiled wiki and responds with citations to specific pages
 Choose: 4
 ```
 
-**5. Status** — quick stats:
+**5. Status** — quick stats at a glance:
 ```
 Choose: 5
 
@@ -169,7 +173,7 @@ When you run **Query**:
 Audits the entire wiki for:
 - Contradictions between pages
 - Orphaned pages not referenced in `index.md`
-- Entities mentioned in source pages but missing their own page
+- Entities mentioned but missing their own page
 - Stale or incomplete pages
 - Cross-reference gaps
 
@@ -211,6 +215,8 @@ You can edit `CLAUDE.md` to customize how the wiki behaves for your domain.
 | `lint.yml` | Every PR | Runs ruff + black check |
 | `publish.yml` | New GitHub release tag | Auto-builds and publishes to PyPI |
 
+All PRs must pass CI and Lint before merging into `main`.
+
 ---
 
 ## Contributing
@@ -224,7 +230,8 @@ pip install anthropic rich pytest ruff black
 python -m pytest tests/
 ```
 
-Please make sure `ruff check .` and `black --check .` pass before submitting.
+Make sure `ruff check .` and `black --check .` pass before submitting.  
+All changes go through a branch → PR → checks green → merge workflow.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
