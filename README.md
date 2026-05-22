@@ -3,8 +3,8 @@
 > An open-source CLI that turns Claude into a self-maintaining knowledge base.  
 > Knowledge is **synthesized at ingest time** — not rediscovered on every query.
 
-[![CI](https://github.com/shrenikpurvant/llm-wiki/actions/workflows/ci.yml/badge.svg)](https://github.com/shrenikpurvant/llm-wiki/actions/workflows/ci.yml)
-[![Lint](https://github.com/shrenikpurvant/llm-wiki/actions/workflows/lint.yml/badge.svg)](https://github.com/shrenikpurvant/llm-wiki/actions/workflows/lint.yml)
+[![CI](https://github.com/S7hrenik/llm-wiki/actions/workflows/ci.yml/badge.svg)](https://github.com/S7hrenik/llm-wiki/actions/workflows/ci.yml)
+[![Lint](https://github.com/S7hrenik/llm-wiki/actions/workflows/lint.yml/badge.svg)](https://github.com/S7hrenik/llm-wiki/actions/workflows/lint.yml)
 [![PyPI](https://img.shields.io/pypi/v/llm-wiki)](https://pypi.org/project/llm-wiki/)
 [![Python](https://img.shields.io/pypi/pyversions/llm-wiki)](https://pypi.org/project/llm-wiki/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -63,7 +63,7 @@ pip install llm-wiki
 Or run from source:
 
 ```bash
-git clone https://github.com/shrenikpurvant/llm-wiki
+git clone https://github.com/S7hrenik/llm-wiki
 cd llm-wiki
 pip install anthropic rich
 ```
@@ -218,7 +218,7 @@ You can edit `CLAUDE.md` to customize how the wiki behaves for your domain.
 Pull requests are welcome. For major changes, open an issue first.
 
 ```bash
-git clone https://github.com/shrenikpurvant/llm-wiki
+git clone https://github.com/S7hrenik/llm-wiki
 cd llm-wiki
 pip install anthropic rich pytest ruff black
 python -m pytest tests/
@@ -236,4 +236,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
 ---
 
-*Built with [Claude](https://anthropic.com) by [Shrenik Purvant](https://github.com/shrenikpurvant)*
+*Built with [Claude](https://anthropic.com) by [Shrenik Purvant](https://github.com/S7hrenik)*

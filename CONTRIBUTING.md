@@ -5,7 +5,7 @@ Thanks for your interest in contributing!
 ## Setup
 
 ```bash
-git clone https://github.com/shrenikpurvant/llm-wiki
+git clone https://github.com/S7hrenik/llm-wiki
 cd llm-wiki
 pip install anthropic rich pytest ruff black
 ```
