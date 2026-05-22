@@ -7,7 +7,7 @@
 [![Lint](https://github.com/S7hrenik/llm-wiki/actions/workflows/lint.yml/badge.svg)](https://github.com/S7hrenik/llm-wiki/actions/workflows/lint.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
-[![PyPI - Coming Soon](https://img.shields.io/badge/PyPI-coming%20soon-lightgrey)](https://pypi.org/project/llm-wikibase/)
+[![PyPI](https://img.shields.io/pypi/v/llm-wikibase)](https://pypi.org/project/llm-wikibase/)
 
 ---
 
@@ -63,21 +63,30 @@ llm-wiki/
 
 ## Install
 
-Clone and run from source:
-
 ```bash
-git clone https://github.com/S7hrenik/llm-wiki
-cd llm-wiki
-pip install anthropic rich
+pip install llm-wikibase
 ```
 
-Create a `.env` file in the project root with your API key:
+Set your API key — create a `.env` file in your working directory:
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-> **PyPI package coming soon** — `pip install llm-wikibase` will be available on the first release.
+> **Windows users:** If `llm-wikibase` is not recognized after install, run this once in PowerShell:
+> ```powershell
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
+> Then open a new terminal.
+
+**Or run from source:**
+
+```bash
+git clone https://github.com/S7hrenik/llm-wiki
+cd llm-wiki
+pip install anthropic rich
+python agent.py
+```
 
 ---
 
