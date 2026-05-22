@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "llm-wikibase"
-version = "0.1.0"
+version = "0.1.1"
 description = "LLM-powered markdown knowledge base CLI — knowledge synthesized at ingest time, not query time."
 readme = "README.md"
 license = { text = "MIT" }
