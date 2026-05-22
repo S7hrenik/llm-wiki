@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "llm-wiki"
+name = "llm-wikibase"
 version = "0.1.0"
 description = "LLM-powered markdown knowledge base CLI — knowledge synthesized at ingest time, not query time."
 readme = "README.md"
@@ -29,7 +29,7 @@ dependencies = [
 ]
 
 [project.scripts]
-llm-wiki = "agent:main"
+llm-wikibase = "agent:main"
 
 [project.urls]
 Homepage = "https://github.com/S7hrenik/llm-wiki"
@@ -37,8 +37,10 @@ Repository = "https://github.com/S7hrenik/llm-wiki"
 Issues = "https://github.com/S7hrenik/llm-wiki/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
 include = ["agent.py", "CLAUDE.md"]
+
+[tool.hatch.build.targets.sdist]
+include = ["agent.py", "CLAUDE.md", "README.md", "LICENSE", "pyproject.toml"]
 
 [tool.ruff]
 line-length = 100

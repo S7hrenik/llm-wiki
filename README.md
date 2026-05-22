@@ -7,7 +7,7 @@
 [![Lint](https://github.com/S7hrenik/llm-wiki/actions/workflows/lint.yml/badge.svg)](https://github.com/S7hrenik/llm-wiki/actions/workflows/lint.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
-[![PyPI - Coming Soon](https://img.shields.io/badge/PyPI-coming%20soon-lightgrey)](https://pypi.org/project/llm-wiki/)
+[![PyPI - Coming Soon](https://img.shields.io/badge/PyPI-coming%20soon-lightgrey)](https://pypi.org/project/llm-wikibase/)
 
 ---
 
@@ -77,7 +77,7 @@ Create a `.env` file in the project root with your API key:
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-> **PyPI package coming soon** — `pip install llm-wiki` will be available on the first release.
+> **PyPI package coming soon** — `pip install llm-wikibase` will be available on the first release.
 
 ---
 
