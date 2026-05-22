@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install anthropic pytest pytest-cov
+          pip install anthropic rich pytest pytest-cov
 
       - name: Run tests
         run: pytest --cov=agent --cov-report=term-missing
