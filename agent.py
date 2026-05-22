@@ -506,5 +506,9 @@ def run():
         show_banner()
 
 
+def main():
+    run()
+
+
 if __name__ == "__main__":
     run()
