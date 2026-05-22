@@ -14,9 +14,9 @@ import agent
 def tmp_wiki(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(agent, "WIKI_DIR", tmp_path / "wiki")
-    monkeypatch.setattr(agent, "RAW_DIR",  tmp_path / "raw")
-    monkeypatch.setattr(agent, "INDEX",    tmp_path / "wiki" / "index.md")
-    monkeypatch.setattr(agent, "LOG",      tmp_path / "wiki" / "log.md")
+    monkeypatch.setattr(agent, "RAW_DIR", tmp_path / "raw")
+    monkeypatch.setattr(agent, "INDEX", tmp_path / "wiki" / "index.md")
+    monkeypatch.setattr(agent, "LOG", tmp_path / "wiki" / "log.md")
     monkeypatch.setattr(agent, "OVERVIEW", tmp_path / "wiki" / "overview.md")
     monkeypatch.setattr(agent, "CLAUDE_MD", tmp_path / "CLAUDE.md")
     return tmp_path
@@ -144,8 +144,10 @@ def test_query_returns_answer(tmp_wiki, capsys):
         content=[MagicMock(text="The answer is 42, per wiki/entities/test.md.")]
     )
 
-    with patch("agent.get_client", return_value=mock_client), \
-         patch("agent.Confirm.ask", return_value=False):
+    with (
+        patch("agent.get_client", return_value=mock_client),
+        patch("agent.Confirm.ask", return_value=False),
+    ):
         agent.cmd_query(question="What is the answer?")
 
 

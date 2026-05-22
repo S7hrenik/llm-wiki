@@ -56,7 +56,9 @@ def load_index() -> str:
     return INDEX.read_text(encoding="utf-8") if INDEX.exists() else ""
 
 
-def call_claude(client: anthropic.Anthropic, system: str, user: str, spinner_msg: str = "Claude is thinking...") -> str:
+def call_claude(
+    client: anthropic.Anthropic, system: str, user: str, spinner_msg: str = "Claude is thinking..."
+) -> str:
     with console.status(f"[bold cyan]{spinner_msg}[/]", spinner="dots"):
         response = client.messages.create(
             model=MODEL,
@@ -92,10 +94,11 @@ def _gather_wiki_context(question: str, index_content: str) -> str:
 def _save_query_as_page(question: str, answer: str):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     out = WIKI_DIR / "sources" / f"query-{_slugify(question[:50])}.md"
-    out.write_text(
-        f"---\ntitle: Query — {question}\ntype: query\ndate: {now}\n---\n\n# {question}\n\n{answer}\n",
-        encoding="utf-8",
+    content = (
+        f"---\ntitle: Query — {question}\ntype: query\ndate: {now}\n---\n\n"
+        f"# {question}\n\n{answer}\n"
     )
+    out.write_text(content, encoding="utf-8")
     return out
 
 
@@ -126,36 +129,40 @@ def show_banner():
     )
 
     console.print()
-    console.print(Panel(
-        Align.center(Text.assemble(art, tagline)),
-        border_style="bright_cyan",
-        box=box.DOUBLE_EDGE,
-        padding=(1, 2),
-    ))
+    console.print(
+        Panel(
+            Align.center(Text.assemble(art, tagline)),
+            border_style="bright_cyan",
+            box=box.DOUBLE_EDGE,
+            padding=(1, 2),
+        )
+    )
     console.print()
 
 
 def show_menu():
     table = Table(box=box.SIMPLE, show_header=False, padding=(0, 3))
-    table.add_column("key",  style="bold bright_cyan", no_wrap=True, width=5)
+    table.add_column("key", style="bold bright_cyan", no_wrap=True, width=5)
     table.add_column("icon", width=3)
-    table.add_column("cmd",  style="bold white", width=10)
+    table.add_column("cmd", style="bold white", width=10)
     table.add_column("desc", style="dim white")
 
-    table.add_row("[1]", "🚀", "Init",   "Bootstrap a new wiki")
+    table.add_row("[1]", "🚀", "Init", "Bootstrap a new wiki")
     table.add_row("[2]", "📥", "Ingest", "Add a document or URL to the wiki")
-    table.add_row("[3]", "🔍", "Query",  "Ask a question, get a cited answer")
-    table.add_row("[4]", "🔧", "Lint",   "Health-check for gaps & contradictions")
+    table.add_row("[3]", "🔍", "Query", "Ask a question, get a cited answer")
+    table.add_row("[4]", "🔧", "Lint", "Health-check for gaps & contradictions")
     table.add_row("[5]", "📊", "Status", "Wiki stats at a glance")
-    table.add_row("",    "",   "",       "")
-    table.add_row("[0]", "👋", "Exit",   "")
+    table.add_row("", "", "", "")
+    table.add_row("[0]", "👋", "Exit", "")
 
-    console.print(Panel(
-        Align.center(table),
-        title="[bold bright_cyan]  MENU  [/]",
-        border_style="cyan",
-        box=box.ROUNDED,
-    ))
+    console.print(
+        Panel(
+            Align.center(table),
+            title="[bold bright_cyan]  MENU  [/]",
+            border_style="cyan",
+            box=box.ROUNDED,
+        )
+    )
 
 
 # ── Commands ──────────────────────────────────────────────────────────────────
@@ -175,8 +182,13 @@ def cmd_init():
     (RAW_DIR / "assets").mkdir(exist_ok=True)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    INDEX.write_text(f"# Wiki Index\n\nLast updated: {now}\n\n## Sources\n\n## Entities\n", encoding="utf-8")
-    LOG.write_text(f"# Wiki Log\n\n## {now} — INIT\n\n- **Action:** INIT\n- **Notes:** Wiki initialized.\n", encoding="utf-8")
+    INDEX.write_text(
+        f"# Wiki Index\n\nLast updated: {now}\n\n## Sources\n\n## Entities\n", encoding="utf-8"
+    )
+    LOG.write_text(
+        f"# Wiki Log\n\n## {now} — INIT\n\n- **Action:** INIT\n- **Notes:** Wiki initialized.\n",
+        encoding="utf-8",
+    )
     OVERVIEW.write_text(
         f"# Knowledge Base Overview\n\nLast updated: {now}\n\n"
         "## Themes\n\n_No content yet._\n\n"
@@ -209,6 +221,7 @@ def cmd_ingest(source: str | None = None):
         with console.status("[cyan]Fetching URL...[/]", spinner="dots"):
             try:
                 import urllib.request
+
                 with urllib.request.urlopen(source) as resp:
                     raw_content = resp.read().decode("utf-8", errors="replace")
             except Exception as e:
@@ -259,16 +272,23 @@ Respond in this exact format:
     for line in response.splitlines(keepends=True):
         tag = line.strip()
         if tag == "===SOURCE_PAGE===":
-            current = "source"; buf = []
+            current = "source"
+            buf = []
         elif tag == "===ENTITY_PAGES===":
-            if current: sections[current] = "".join(buf)
-            current = "entities"; buf = []
+            if current:
+                sections[current] = "".join(buf)
+            current = "entities"
+            buf = []
         elif tag == "===INDEX_UPDATE===":
-            if current: sections[current] = "".join(buf)
-            current = "index"; buf = []
+            if current:
+                sections[current] = "".join(buf)
+            current = "index"
+            buf = []
         elif tag == "===LOG_ENTRY===":
-            if current: sections[current] = "".join(buf)
-            current = "log"; buf = []
+            if current:
+                sections[current] = "".join(buf)
+            current = "log"
+            buf = []
         else:
             buf.append(line)
     if current:
@@ -286,7 +306,9 @@ Respond in this exact format:
         created.append((str(out), "source page"))
 
     entities_block = sections.get("entities", "")
-    for m in re.finditer(r"---FILE: (wiki/entities/[^\n]+\.md)---\n(.*?)(?=---FILE:|$)", entities_block, re.DOTALL):
+    for m in re.finditer(
+        r"---FILE: (wiki/entities/[^\n]+\.md)---\n(.*?)(?=---FILE:|$)", entities_block, re.DOTALL
+    ):
         fp = Path(m.group(1).strip())
         fp.parent.mkdir(parents=True, exist_ok=True)
         fp.write_text(m.group(2).strip(), encoding="utf-8")
@@ -301,7 +323,9 @@ Respond in this exact format:
     if log_entry and LOG.exists():
         existing = LOG.read_text(encoding="utf-8")
         lines = existing.split("\n", 1)
-        LOG.write_text(f"{lines[0]}\n\n{log_entry}\n{lines[1] if len(lines) > 1 else ''}", encoding="utf-8")
+        LOG.write_text(
+            f"{lines[0]}\n\n{log_entry}\n{lines[1] if len(lines) > 1 else ''}", encoding="utf-8"
+        )
         created.append((str(LOG), "log"))
 
     table = Table(box=box.SIMPLE, show_header=True, padding=(0, 2))
@@ -310,11 +334,13 @@ Respond in this exact format:
     for path, kind in created:
         table.add_row(path, kind)
 
-    console.print(Panel(
-        table,
-        title=f"[green]  ✅ Ingested: [white]{source_label}[/]  [/]",
-        border_style="green",
-    ))
+    console.print(
+        Panel(
+            table,
+            title=f"[green]  ✅ Ingested: [white]{source_label}[/]  [/]",
+            border_style="green",
+        )
+    )
 
 
 def cmd_query(question: str | None = None):
@@ -328,25 +354,23 @@ def cmd_query(question: str | None = None):
     client = get_client()
     wiki_context = _gather_wiki_context(question, load_index())
 
-    system = f"""You are an LLM Wiki Agent in query mode. Answer using only the pre-compiled wiki pages.
-Always cite which wiki page each fact came from. Use rich markdown formatting.
-
-<schema>
-{load_schema()}
-</schema>
-
-<wiki_context>
-{wiki_context}
-</wiki_context>"""
+    system = (
+        "You are an LLM Wiki Agent in query mode. Answer using only the pre-compiled wiki pages.\n"
+        "Always cite which wiki page each fact came from. Use rich markdown formatting.\n"
+        f"\n<schema>\n{load_schema()}\n</schema>"
+        f"\n<wiki_context>\n{wiki_context}\n</wiki_context>"
+    )
 
     response = call_claude(client, system, f"Question: {question}", "Searching the wiki...")
 
-    console.print(Panel(
-        response,
-        title=f"[bold cyan]  ❓ {question}  [/]",
-        border_style="cyan",
-        padding=(1, 2),
-    ))
+    console.print(
+        Panel(
+            response,
+            title=f"[bold cyan]  ❓ {question}  [/]",
+            border_style="cyan",
+            padding=(1, 2),
+        )
+    )
 
     if save:
         out = _save_query_as_page(question, response)
@@ -379,14 +403,18 @@ def cmd_lint():
 {load_schema()}
 </schema>"""
 
-    response = call_claude(client, system, f"Audit this wiki:\n\n{wiki_dump}", "Auditing the wiki...")
+    response = call_claude(
+        client, system, f"Audit this wiki:\n\n{wiki_dump}", "Auditing the wiki..."
+    )
 
-    console.print(Panel(
-        response,
-        title="[bold yellow]  🔧 Lint Report  [/]",
-        border_style="yellow",
-        padding=(1, 2),
-    ))
+    console.print(
+        Panel(
+            response,
+            title="[bold yellow]  🔧 Lint Report  [/]",
+            border_style="yellow",
+            padding=(1, 2),
+        )
+    )
 
 
 def cmd_status():
@@ -396,12 +424,16 @@ def cmd_status():
         console.print("[yellow]Wiki not initialized.[/] Run [cyan]Init[/] first.")
         return
 
-    sources  = list((WIKI_DIR / "sources").glob("*.md"))  if (WIKI_DIR / "sources").exists()  else []
-    entities = list((WIKI_DIR / "entities").glob("*.md")) if (WIKI_DIR / "entities").exists() else []
+    sources = list((WIKI_DIR / "sources").glob("*.md")) if (WIKI_DIR / "sources").exists() else []
+    entities = (
+        list((WIKI_DIR / "entities").glob("*.md")) if (WIKI_DIR / "entities").exists() else []
+    )
 
     last_ingest = "—"
     if LOG.exists():
-        matches = re.findall(r"## (\d{4}-\d{2}-\d{2} \d{2}:\d{2}) — INGEST", LOG.read_text(encoding="utf-8"))
+        matches = re.findall(
+            r"## (\d{4}-\d{2}-\d{2} \d{2}:\d{2}) — INGEST", LOG.read_text(encoding="utf-8")
+        )
         if matches:
             last_ingest = matches[0]
 
@@ -410,24 +442,26 @@ def cmd_status():
     table.add_column("value", style="bold bright_white")
     table.add_row("📄  Source pages", str(len(sources)))
     table.add_row("🏷️   Entity pages", str(len(entities)))
-    table.add_row("🕐  Last ingest",  last_ingest)
-    table.add_row("📁  Wiki dir",     str(WIKI_DIR.resolve()))
+    table.add_row("🕐  Last ingest", last_ingest)
+    table.add_row("📁  Wiki dir", str(WIKI_DIR.resolve()))
 
-    console.print(Panel(
-        Align.center(table),
-        title="[bold cyan]  📊 Wiki Status  [/]",
-        border_style="cyan",
-    ))
+    console.print(
+        Panel(
+            Align.center(table),
+            title="[bold cyan]  📊 Wiki Status  [/]",
+            border_style="cyan",
+        )
+    )
 
 
 # ── Interactive loop ──────────────────────────────────────────────────────────
 
 
 COMMANDS = {
-    "1": ("Init",   cmd_init),
+    "1": ("Init", cmd_init),
     "2": ("Ingest", cmd_ingest),
-    "3": ("Query",  cmd_query),
-    "4": ("Lint",   cmd_lint),
+    "3": ("Query", cmd_query),
+    "4": ("Lint", cmd_lint),
     "5": ("Status", cmd_status),
 }
 
@@ -443,12 +477,16 @@ def run():
 
         if choice == "0":
             console.print()
-            console.print(Panel(
-                Align.center(Text("Goodbye. Your wiki will remember. 🧠", style="italic dim white")),
-                border_style="dim cyan",
-                box=box.ROUNDED,
-                padding=(1, 4),
-            ))
+            console.print(
+                Panel(
+                    Align.center(
+                        Text("Goodbye. Your wiki will remember. 🧠", style="italic dim white")
+                    ),
+                    border_style="dim cyan",
+                    box=box.ROUNDED,
+                    padding=(1, 4),
+                )
+            )
             console.print()
             break
 
